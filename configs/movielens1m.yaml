@@ -1,0 +1,25 @@
+dataset: ml1m
+paths:
+  raw: data/raw/ml-1m
+  proc: data/proc
+  props: data/props
+  judge: data/judge
+  synth: data/synth
+prep:
+  pop_bins: 5
+  age_bins: 5
+recjudge:
+  L_history: 10
+  pairs_per_user: 60
+  match_cols: ["pop_bin", "age_bin"]
+  llm:
+    temperature: 0.2
+    max_tokens: 256
+calib:
+  ips_features: ["user_freq","item_pop","item_age","hour","weekday","user_entropy"]
+exposynth:
+  tail_ratio_target: 0.8
+  steps_per_user: 8
+  anchors_k: 4
+
+

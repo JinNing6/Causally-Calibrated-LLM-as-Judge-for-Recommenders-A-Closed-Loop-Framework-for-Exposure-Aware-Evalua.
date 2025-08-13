@@ -1,0 +1,17 @@
+[project]
+name = "lure"
+version = "0.0.1"
+description = "LURE: LLM-based Unbiasing & Rationale-grounded Evaluation/Data Gen for Recsys (pre-research skeleton)"
+requires-python = ">=3.10"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+select = ["E", "F", "W", "I"]
+ignore = []
+
+

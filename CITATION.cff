@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "LURE: LLM-based Unbiasing & Rationale-grounded Evaluation/Data Generation for Recommenders"
+authors:
+  - family-names: Zhang
+    given-names: Jinqian
+date-released: 2025-08-13
+version: 0.1.0
+message: "If you use this repo, please cite it as below."
+
+

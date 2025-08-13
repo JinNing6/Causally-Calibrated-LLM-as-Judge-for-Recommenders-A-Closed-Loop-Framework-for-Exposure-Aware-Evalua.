@@ -1,0 +1,18 @@
+pandas
+numpy
+scikit-learn
+scipy
+tqdm
+pyyaml
+orjson
+joblib
+statsmodels
+matplotlib
+networkx
+
+# Dev / QA tools
+ruff
+black
+pytest
+
+

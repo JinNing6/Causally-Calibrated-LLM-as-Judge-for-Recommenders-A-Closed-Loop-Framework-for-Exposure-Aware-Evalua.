@@ -5,3 +5,20 @@ __pycache__/
 data/*/tmp*
 
 
+.venv/
+venv/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+data/
+reports/
+paper/*.pdf
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+paper/*.fdb_latexmk
+paper/*.fls

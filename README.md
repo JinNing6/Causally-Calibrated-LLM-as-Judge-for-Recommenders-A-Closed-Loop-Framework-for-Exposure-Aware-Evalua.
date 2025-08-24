@@ -32,6 +32,10 @@ python calib/run_correlation.py
 - 表格类结果：`reports/tables/*.csv`
 - 图形类结果：`reports/figs/*.png`
 
+### 论文
+
+- LaTeX 初稿位于 `paper/` 目录，可用 `pdflatex` 或 `xelatex` 编译。
+
 ### 环境与安装
 
 - **环境**: Python >= 3.10

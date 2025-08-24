@@ -15,4 +15,7 @@ ruff
 black
 pytest
 
+openai>=1.30.0
+dashscope>=1.19.0
+
 

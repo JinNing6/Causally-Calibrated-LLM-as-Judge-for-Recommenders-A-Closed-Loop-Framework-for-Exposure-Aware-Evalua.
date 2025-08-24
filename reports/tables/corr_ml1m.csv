@@ -1,0 +1,4 @@
+model,ips_pair_auc,ips_pair_auc_snips,ips_pair_auc_clip1e-4,ips_recall@20,ips_recall@20_snips,ips_recall@20_clip1e-4,ips_recall@20_dr,rjs_tau,spearman_rjs_vs_ips_recall20,kendall_rjs_vs_ips_recall20,r2_isotonic_rjs_to_ips_recall20
+model_pop,0.535,0.535,0.535,1.0,1.0,1.0,1.0,0.07,,,1.0
+model_content,0.45,0.45,0.45,1.0,1.0,1.0,1.0,-0.1,,,1.0
+model_random,0.465,0.465,0.465,1.0,1.0,1.0,1.0,-0.07,,,1.0

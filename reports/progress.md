@@ -1,0 +1,16 @@
+### 进度仪表盘
+- ❌ 环境变量与后端: backend/model/keys detected; llm.py lacks 'tongyi' backend keyword (backend=qwen, model=qwen-plus-latest, has_OPENAI_API_KEY=False, has_QWEN_API_KEY=True, has_DASHSCOPE_API_KEY=False, has_TONGYI_API_KEY=False)
+   - 建议: 更新 recjudge/llm.py 以支持 'tongyi' 或将 LLM_BACKEND 设置为 'qwen' (DashScope 兼容)。
+- ✅ 文件: interactions: 存在 (path=E:\cursor\papers_demo\LURE\data\proc\ml1m_interactions.parquet, rows=1000209, n_users=6040, n_items=3706)
+- ✅ 文件: items: 存在 (path=E:\cursor\papers_demo\LURE\data\proc\ml1m_items.parquet, rows=3883, n_pop_bin=5, n_age_bin=5)
+- ✅ 文件: propensity: 存在 (path=E:\cursor\papers_demo\LURE\data\props\propensity.parquet, rows=1000209, n_users=6040, n_items=3706)
+- ❌ 文件: pairs: 缺失: E:\cursor\papers_demo\LURE\data\judge\pairs.parquet
+   - 建议: python recjudge/pair_sampler.py --config configs/movielens1m.yaml
+- ❌ 文件: judge_clean: 缺失: E:\cursor\papers_demo\LURE\data\judge\judge_clean.parquet
+   - 建议: 先运行 recjudge/run_judge.py，或确认输出路径；本脚本读取 data/judge/judge_clean.parquet
+- ✅ 文件: rjs_csv: 存在 (path=E:\cursor\papers_demo\LURE\reports\tables\rjs_ml1m.csv)
+- ❌ 文件: corr_csv: 缺失: E:\cursor\papers_demo\LURE\reports\tables\corr_ml1m.csv
+- ❌ 文件: calib_png: 缺失: E:\cursor\papers_demo\LURE\reports\figs\calib_isotonic.png
+- ❌ 文件: synth_tail: 缺失: E:\cursor\papers_demo\LURE\data\synth\ml1m_tail_aug.parquet
+- ❌ 连通性: mini-RJS: 读取 judge_clean 失败: E:\cursor\papers_demo\LURE\data\judge\judge_clean.parquet
+- ✅ Git 状态: ok (branch=main, last_commit=docs: expand README with modules intro, quickstart pipeline, data paths, outputs, and setup, dirty=True)

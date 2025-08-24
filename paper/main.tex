@@ -1,30 +1,53 @@
-\documentclass[10pt]{article}
-\usepackage[margin=1in]{geometry}
-\usepackage{times}
+\documentclass[sigconf,anonymous,review]{acmart}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{hyperref}
 
-\title{LURE: LLM-based Unbiasing and Rationale-grounded Evaluation/Data Generation for Recommender Systems}
-\author{Anonymous}
+% ACM/SIGIR metadata (placeholders during review)
+\acmConference[SIGIR '25]{Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval}{2025}{TBD}
+\acmYear{2025}
+\setcopyright{none}
+\acmISBN{}
+\acmDOI{}
+
+\title{Causally Calibrated LLM-as-Judge for Recommenders: A Closed-Loop Framework for Exposure-Aware Evaluation and Synthetic Interaction Generation}
+\author{Anonymous Author(s)}
+\affiliation{\institution{Anonymous Submission} \country{}}
 \date{}
 
 \begin{document}
-\maketitle
+
+\section*{Contributions}
+We propose a closed-loop, exposure-aware evaluation framework with the following contributions:
+\begin{itemize}
+  \item \textbf{Exposure-aware LLM-as-Judge} on matched item pairs, with \emph{evidence-aligned} rationales auditable by exact substring checks.
+  \item \textbf{Causal estimators for metrics} (IPS/SNIPS/DR) with clipping/trimming and overlap diagnostics; user-level agreement (RJS) for \emph{user-fair} aggregation.
+  \item \textbf{Monotonic causal calibration} from judge scores to IPS-Recall@\(K\), preserving order and improving offline--online alignment.
+  \item \textbf{Exposure-controlled synthesis} that augments long-tail interactions under collaborative constraints, enabling an evaluate--synthesize--re-evaluate loop.
+\end{itemize}
 
 \begin{abstract}
-Large language models (LLMs) show promise as evaluators of recommender systems, yet existing “LLM-as-Judge” paradigms largely overlook exposure bias, lack auditable rationales, and seldom demonstrate external validity to online impact. We introduce LURE, a unified framework comprising: (i) RecJudge-X, an exposure-aware, rationale-grounded judge that operates on matched item pairs and outputs verifiable evidence; (ii) ExpoSynth, an exposure-controllable synthesizer that fills long-tail data gaps under collaborative constraints; and (iii) Calib-Link, a monotonic calibration mapping from LLM-based judge scores to IPS proxies of online lift. LURE operationalizes causal unbiasing with inverse propensity scoring (IPS), enforces evidence alignment to curb hallucination, and provides a reproducible evaluate–synthesize–re-evaluate loop. On a MovieLens-1M prototype, LURE yields stable IPS-weighted pairwise agreement and long-tail augmentation with controllable exposure. We discuss broader impacts, limitations, and a path toward human-centered scientific evaluation at scale.
+Large language models (LLMs) are increasingly used as evaluators for recommender systems, but most \emph{LLM-as-Judge} paradigms ignore exposure bias, lack auditable evidence, and rarely connect offline judgments to online impact. We present a closed-loop framework that unifies: (i) an exposure-aware, rationale-grounded judge operating on matched pairs with verifiable evidence; (ii) an exposure-controlled synthesizer that fills tail data gaps under collaborative constraints; and (iii) a causal calibration link mapping judge scores to inverse-propensity (IPS) proxies of online lift via monotonic regression. Our judge enforces evidence alignment to curb hallucinations; our metrics use IPS/SNIPS/DR estimators with overlap diagnostics and sensitivity to clipping/trimming; and our synthesizer controls exposure while respecting sequence plausibility. On MovieLens-1M, we demonstrate a reproducible evaluate–synthesize–re-evaluate loop: stable IPS-weighted pairwise agreement, interpretable user-level agreement (RJS), exposure-controlled tail augmentation, and a monotonic calibration from RJS to IPS-Recall@K. We release code, configs, and reports to facilitate rigorous, evidence-audited, exposure-aware evaluation.
 \end{abstract}
+
+\ccsdesc[500]{Information systems~Recommender systems}
+\ccsdesc[300]{Information systems~Evaluation of retrieval results}
+
+\keywords{recommender systems, LLM-as-Judge, exposure bias, IPS/SNIPS/DR, isotonic calibration, synthetic interactions}
+
+\maketitle
 
 \section{Introduction}
 Traditional offline metrics (e.g., HR/NDCG/AUC) depend on exposure distributions and negative sampling protocols, leading to blind spots in long-tail, cold-start, cross-domain, and user experience evaluation. Prior \emph{LLM-as-Judge} often rely on subjective scoring without modeling exposure bias or externally validating to online impact. Real logs are sparse in the tail, limiting training and generalization. LURE aims at an exposure-aware, rationale-grounded judge paired with an exposure-controllable synthesizer to form a \emph{evaluate–synthesize–re-evaluate} loop for fairer offline evaluation and tail-aware training.
 
-\section{Background and Method Overview}
+\section{Problem Setup and Method Overview}
 \paragraph{Exposure bias in recommenders.} Logged interactions reflect a product of user preference and platform exposure. Offline metrics computed under the logged exposure distribution can be misaligned with counterfactual performance. IPS and doubly-robust (DR) estimators are standard tools for causal unbiasing in recommendation and bandits.
 
 \paragraph{Overview.} LURE comprises: (i) \textbf{RecJudge-X}, an exposure-aware LLM judge with matched pairs, IPS weighting, and evidence-aligned rationales; (ii) \textbf{ExpoSynth}, a constraint-driven synthesizer that targets a desired exposure curve; and (iii) \textbf{Calib-Link}, an isotonic (monotonic) regression \(g\) mapping judge scores to IPS proxies or online metrics.
+
+\subsection*{Assumptions and Overlap}
+We estimate exposure propensity \(\hat{\pi}(i\mid u)\) from observational features and rely on standard causal assumptions: consistency, positivity (overlap), and no unmeasured confounding for exposure given features. We report overlap diagnostics (min/quantiles and mass below thresholds) and conduct clipping/trimming sensitivity to mitigate finite-sample instability.
 
 \subsection{RecJudge-X}
 \paragraph{Input representation.} For each user \(u\), we construct a history block (titles, genres, and meta bins) and candidate item blocks. The prompt enforces a strict JSON schema with a field \texttt{winner\;\in\;\{i,j,tie\}}, confidence \(p \in [0,1]\), and a list of \texttt{rationales} each containing an \texttt{evidence} substring that must exactly match the input. We parse the output, tolerate minor formatting errors, and verify that every evidence span is a substring of the prompt; non-conforming instances are down-weighted or discarded.
@@ -51,9 +74,9 @@ Traditional offline metrics (e.g., HR/NDCG/AUC) depend on exposure distributions
 
 \subsection{Calib-Link}
 \label{sec:calib}
-Given tuples \(\{(M_k, \mathrm{RJS}_k, \widehat{\Delta \mathrm{Recall}}^{\mathrm{IPS}}_{k})\}_k\), we fit an isotonic regressor \(g\) such that \(g(\mathrm{RJS})\approx \widehat{\Delta \mathrm{Recall}}^{\mathrm{IPS}}\). We report Spearman \(\rho\), Kendall \(\tau\), and \(R^2\). Isotonicity preserves ordering and improves extrapolation stability.
+Given tuples \(\{(M_k, \mathrm{RJS}_k, \widehat{\Delta \mathrm{Recall}}^{\mathrm{IPS}}_{k})\}_k\), we fit an isotonic regressor \(g\) such that \(g(\mathrm{RJS})\approx \widehat{\Delta \mathrm{Recall}}^{\mathrm{IPS}}\). We report Spearman \(\rho\), Kendall \(\tau\), and \(R^2\). Isotonicity preserves ordering and improves extrapolation stability. We compute IPS/SNIPS/DR variants with clipping/trimming sweeps and user-level bootstrap to form confidence intervals.
 
-\section{Prototype and Reproducibility}
+\section{Experimental Protocol and Reproducibility}
 We use MovieLens-1M. Propensity \(\hat{\pi}\) is estimated with a logistic model over user frequency, item popularity, item age bin, hour, weekday, and user-genre entropy. Pair sampling matches popularity/age bins. Judge is executed with Tongyi (DashScope) via OpenAI-compatible or native APIs; rationales are validated by substring checks. Scripts, configs, and outputs are under version control; see \texttt{configs/movielens1m.yaml} and \texttt{reports/}.
 
 \section{Results}
